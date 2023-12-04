@@ -107,15 +107,15 @@ Try {
     ##* VARIABLE DECLARATION
     ##*===============================================
     ## Variables: Application
-    [String]$appVendor = ''
-    [String]$appName = ''
-    [String]$appVersion = ''
+    [String]$appVendor = 'the pebble group'
+    [String]$appName = 'Sharepoint Desktop Shortcut'
+    [String]$appVersion = '1.0'
     [String]$appArch = ''
     [String]$appLang = 'EN'
     [String]$appRevision = '01'
     [String]$appScriptVersion = '1.0.0'
-    [String]$appScriptDate = 'XX/XX/20XX'
-    [String]$appScriptAuthor = '<author name>'
+    [String]$appScriptDate = '05/06/2021'
+    [String]$appScriptAuthor = 'Joe Bowers'
     ##*===============================================
     ## Variables: Install Titles (Only set here to override defaults set by the toolkit)
     [String]$installName = ''
@@ -182,10 +182,10 @@ Try {
         [String]$installPhase = 'Pre-Installation'
 
         ## Show Welcome Message, close Internet Explorer if required, allow up to 3 deferrals, verify there is enough disk space to complete the install, and persist the prompt
-        Show-InstallationWelcome -CloseApps 'iexplore' -AllowDefer -DeferTimes 3 -CheckDiskSpace -PersistPrompt
+        #Show-InstallationWelcome -CloseApps 'iexplore' -AllowDefer -DeferTimes 3 -CheckDiskSpace -PersistPrompt
 
         ## Show Progress Message (with the default message)
-        Show-InstallationProgress
+        #Show-InstallationProgress
 
         ## <Perform Pre-Installation tasks here>
 
@@ -205,8 +205,9 @@ Try {
             }
         }
 
-        ## <Perform Installation tasks here>
 
+        ## <Perform Installation tasks here>
+        New-Shortcut -Path "$envCommonDesktop\The Pebble Group PLC - Sharepoint.url" -Target "https://thepebblegroup.sharepoint.com/sites/ThePebbleGroupPLC" -IconLocation "$envWinDir\system32\shell32.dll" -IconIndex 4 -Description "TPG Main Sharepoint Site"
 
         ##*===============================================
         ##* POST-INSTALLATION
@@ -217,7 +218,7 @@ Try {
 
         ## Display a message at the end of the install
         If (-not $useDefaultMsi) {
-            Show-InstallationPrompt -Message 'You can customize text to appear at the end of an install or remove it completely for unattended installations.' -ButtonRightText 'OK' -Icon Information -NoWait
+            #Show-InstallationPrompt -Message 'You can customize text to appear at the end of an install or remove it completely for unattended installations.' -ButtonRightText 'OK' -Icon Information -NoWait
         }
     }
     ElseIf ($deploymentType -ieq 'Uninstall') {
@@ -227,10 +228,10 @@ Try {
         [String]$installPhase = 'Pre-Uninstallation'
 
         ## Show Welcome Message, close Internet Explorer with a 60 second countdown before automatically closing
-        Show-InstallationWelcome -CloseApps 'iexplore' -CloseAppsCountdown 60
+        #Show-InstallationWelcome -CloseApps 'iexplore' -CloseAppsCountdown 60
 
         ## Show Progress Message (with the default message)
-        Show-InstallationProgress
+        #Show-InstallationProgress
 
         ## <Perform Pre-Uninstallation tasks here>
 
@@ -249,7 +250,7 @@ Try {
         }
 
         ## <Perform Uninstallation tasks here>
-
+        Remove-File -Path "$envCommonDesktop\The Pebble Group PLC - Sharepoint.url"
 
         ##*===============================================
         ##* POST-UNINSTALLATION
