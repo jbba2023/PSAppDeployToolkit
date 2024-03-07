@@ -1,1 +1,0 @@
-Pnputil /add-driver <”inf_path”>

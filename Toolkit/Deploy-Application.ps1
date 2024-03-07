@@ -107,14 +107,14 @@ Try {
     ##* VARIABLE DECLARATION
     ##*===============================================
     ## Variables: Application
-    [String]$appVendor = 'the pebble group'
-    [String]$appName = 'Sharepoint Desktop Shortcut'
+    [String]$appVendor = 'Brand addition'
+    [String]$appName = 'install ba-man-secureprint'
     [String]$appVersion = '1.0'
     [String]$appArch = ''
     [String]$appLang = 'EN'
     [String]$appRevision = '01'
     [String]$appScriptVersion = '1.0.0'
-    [String]$appScriptDate = '05/06/2021'
+    [String]$appScriptDate = '26/02/2024'
     [String]$appScriptAuthor = 'Joe Bowers'
     ##*===============================================
     ## Variables: Install Titles (Only set here to override defaults set by the toolkit)
@@ -188,7 +188,11 @@ Try {
         #Show-InstallationProgress
 
         ## <Perform Pre-Installation tasks here>
-
+        If (! ( Test-Path -Path "$envProgramData\Printer-Installation" ) ) 
+        {
+            New-Folder -Path "$envProgramData\Printer-Installation"
+        }
+        Copy-File -Path "$DirFiles\UserAddPrinter.ps1" -Destination "$envProgramData\Printer-Installation\UserAddPrinter.ps1" #>
 
         ##*===============================================
         ##* INSTALLATION
@@ -207,15 +211,25 @@ Try {
 
 
         ## <Perform Installation tasks here>
-        New-Shortcut -Path "$envCommonDesktop\The Pebble Group PLC - Sharepoint.url" -Target "https://thepebblegroup.sharepoint.com/sites/ThePebbleGroupPLC" -IconLocation "$envWinDir\system32\shell32.dll" -IconIndex 4 -Description "TPG Main Sharepoint Site"
 
+        pnputil.exe /add-driver "$dirfiles\CNP60MA64.INF" /install
+        Add-PrinterDriver -Name "Canon Generic PCL6" -verbose -ErrorAction SilentlyContinue
+        Add-PrinterPort -Name "Nul:" -ComputerName $env:computername -ErrorAction silentlycontinue
+
+        #Add-Printer -connectionName "\\MAN-PRINT-01.earth.com\BA-Secure-Print"
+        #rundll32.exe printui.dll,PrintUIEntry/if /b "BA-Secure-Print" /f "$dirfiles\CNP60MA64.INF" /r "Nul:" /m "Canon Generic Plus PCL6"
+        #(New-Object -ComObject WScript.Network).AddWindowsPrinterConnection("\\MAN-PRINT-01.earth.com\BA-Secure-Print")
+        
+        Execute-ProcessAsUser -Path "$PSHOME\powershell.exe" -Parameters "-ExecutionPolicy ByPass -Command & { & `"$envProgramData\Printer-Installation\UserAddPrinter.ps1`"; Exit `$LastExitCode }" -Wait
+
+        
         ##*===============================================
         ##* POST-INSTALLATION
         ##*===============================================
         [String]$installPhase = 'Post-Installation'
 
         ## <Perform Post-Installation tasks here>
-
+        Remove-File -Path "$envProgramData\Printer-Installation\UserAddPrinter.ps1"
         ## Display a message at the end of the install
         If (-not $useDefaultMsi) {
             #Show-InstallationPrompt -Message 'You can customize text to appear at the end of an install or remove it completely for unattended installations.' -ButtonRightText 'OK' -Icon Information -NoWait
@@ -235,6 +249,11 @@ Try {
 
         ## <Perform Pre-Uninstallation tasks here>
 
+        If (! ( Test-Path -Path "$envProgramData\Printer-unInstallation" ) ) 
+        {
+            New-Folder -Path "$envProgramData\Printer-unInstallation"
+        }
+        Copy-File -Path "$DirFiles\UserRemovePrinter.ps1" -Destination "$envProgramData\Printer-Installation\UserRemovePrinter.ps1" #>
 
         ##*===============================================
         ##* UNINSTALLATION
@@ -250,7 +269,14 @@ Try {
         }
 
         ## <Perform Uninstallation tasks here>
-        Remove-File -Path "$envCommonDesktop\The Pebble Group PLC - Sharepoint.url"
+        
+        #Remove-Printer -Name "\\MAN-PRINT-01.earth.com\BA-Secure-Print" -verbose -ErrorAction SilentlyContinue
+        #Get-Printer | Where-object {$_.Name -like "*BA-Secure-Print*" } | Remove-Printer 
+        
+        $result = Execute-ProcessAsUser -Path "$PSHOME\powershell.exe" -Parameters "-ExecutionPolicy ByPass -Command & { & `"$envProgramData\Printer-Installation\UserRemovePrinter.ps1`"; Exit `$LastExitCode }" -Wait -PassThru
+        # rundll32 printui.dll PrintUIEntry /dn /n\\MAN-PRINT-01.earth.com\BA-Secure-Print
+        # (New-Object -ComObject WScript.Network).RemovePrinterConnection("\\MAN-PRINT-01.earth.com\BA-Secure-Print")
+        Remove-PrinterDriver -Name "Canon Generic PCL6 Driver" -verbose
 
         ##*===============================================
         ##* POST-UNINSTALLATION
