@@ -106,8 +106,8 @@ Try {
     ##* VARIABLE DECLARATION
     ##*===============================================
     ## Variables: Application
-    [String]$appVendor = 'the pebble group'
-    [String]$appName = 'Sharepoint Desktop Shortcut'
+    [String]$appVendor = ''
+    [String]$appName = ''
     [String]$appVersion = '1.0'
     [String]$appArch = ''
     [String]$appLang = 'EN'
@@ -206,7 +206,7 @@ Try {
 
 
         ## <Perform Installation tasks here>
-        New-Shortcut -Path "$envCommonDesktop\The Pebble Group PLC - Sharepoint.url" -Target "https://thepebblegroup.sharepoint.com/sites/ThePebbleGroupPLC" -IconLocation "$envWinDir\system32\shell32.dll" -IconIndex 4 -Description "TPG Main Sharepoint Site"
+        
 
         ##*===============================================
         ##* POST-INSTALLATION
@@ -249,7 +249,7 @@ Try {
         }
 
         ## <Perform Uninstallation tasks here>
-        Remove-File -Path "$envCommonDesktop\The Pebble Group PLC - Sharepoint.url"
+        
 
         ##*===============================================
         ##* POST-UNINSTALLATION
